@@ -1,0 +1,4 @@
+src/*
+.venv/
+!src/main.py
+!src/requirements.txt
