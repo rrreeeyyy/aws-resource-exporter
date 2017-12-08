@@ -9,7 +9,10 @@ def handler(event, context):
     _aws_ec2_instance_count(instance_gauge)
     _aws_ec2_spot_instance_requests_count(spot_instance_guage)
 
-    return generate_latest().decode('utf-8')
+    headers = {
+        'Content-Type': 'text/plain'
+    }
+    return {'statusCode': 200, 'body': generate_latest().decode('utf-8'), 'headers': headers}
 
 def _aws_ec2_instance_count(gauge):
     ec2 = resource('ec2')
