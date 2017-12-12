@@ -10,7 +10,13 @@ Resources:
       Handler: main.handler
       Runtime: python3.6
       Timeout: 30
-      Policies: AmazonEC2ReadOnlyAccess
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - ec2:DescribtInstances
+                - ec2:DescribeSpotInstanceRequests
       Events:
         Api:
           Type: Api
