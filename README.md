@@ -8,6 +8,10 @@
 ## Package
 
 ```
+pip install -r src/requirements.txt -t src
+```
+
+```
 aws cloudformation package --template-file template.yaml --output-template-file aws-resource-exporter.yaml --s3-bucket <YOUR_S3_BUCKET>
 ```
 
