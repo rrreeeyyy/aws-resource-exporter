@@ -1,4 +1,5 @@
 src/*
 .venv/
+aws-resource-exporter.yaml
 !src/main.py
 !src/requirements.txt

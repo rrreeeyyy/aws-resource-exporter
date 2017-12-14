@@ -1,11 +1,13 @@
 from boto3 import client
+from itertools import chain
 from collections import Counter
 from prometheus_client import Gauge, generate_latest
 
+instance_gauge = Gauge('aws_instance_count', 'AWS instance count by instance_type', ['instance_type'])
+spot_instance_guage = Gauge('aws_spot_instance_count', 'AWS spot instance count by instance_type', ['instance_type'])
+
 
 def handler(event, context):
-    instance_gauge = Gauge('aws_instance_count', 'AWS instance count by instance_type', ['instance_type'])
-    spot_instance_guage = Gauge('aws_spot_instance_count', 'AWS spot instance count by instance_type', ['instance_type'])
     _aws_ec2_instance_count(instance_gauge, event)
     _aws_ec2_spot_instance_requests_count(spot_instance_guage, event)
 
@@ -17,8 +19,9 @@ def handler(event, context):
 
 def _aws_ec2_instance_count(gauge, event):
     ec2 = client('ec2', region_name=event['queryStringParameters'].get('region', 'ap-northeast-1'))
-    instances = ec2.describe_instances(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])['Reservations']
-    counter = Counter([instance['Instances'][0]['InstanceType'] for instance in instances])
+    reservations = ec2.describe_instances(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])['Reservations']
+    instances = chain.from_iterable([reservation['Instances'] for reservation in reservations])
+    counter = Counter([instance['InstanceType'] for instance in instances])
 
     for instance_type, count in counter.most_common():
         gauge.labels(instance_type).inc(count)
