@@ -18,7 +18,7 @@ def handler(event, context):
 
 
 def _aws_ec2_instance_count(gauge, event):
-    ec2 = client('ec2', region_name=event['queryStringParameters'].get('region', 'ap-northeast-1'))
+    ec2 = client('ec2', region_name=event.get('queryStringParameters', {}).get('region', 'ap-northeast-1'))
     reservations = ec2.describe_instances(Filters=[{'Name': 'instance-state-name', 'Values': ['running']}])['Reservations']
     instances = chain.from_iterable([reservation['Instances'] for reservation in reservations])
     counter = Counter([instance['InstanceType'] for instance in instances])
@@ -28,7 +28,7 @@ def _aws_ec2_instance_count(gauge, event):
 
 
 def _aws_ec2_spot_instance_requests_count(gauge, event):
-    ec2 = client('ec2', region_name=event['queryStringParameters'].get('region', 'ap-northeast-1'))
+    ec2 = client('ec2', region_name=event.get('queryStringParameters', {}).get('region', 'ap-northeast-1'))
     instances = ec2.describe_spot_instance_requests(Filters=[{'Name': 'state', 'Values': ['active']}])['SpotInstanceRequests']
     counter = Counter([instance['LaunchSpecification']['InstanceType'] for instance in instances])
 
